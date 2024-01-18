@@ -13,12 +13,17 @@ from core.response import MyResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.urls import reverse
+from constants import currently_hosted_domain
+from django.shortcuts import render
 
 class RegisterView(APIView):
     def post(self, request, format=None):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            user.is_active = False
+            user.save()
             otp = save_otp(user)
             print(otp)
             mail_data = {
@@ -26,15 +31,19 @@ class RegisterView(APIView):
                 "subject": "Welcome to Color Memoir!",
                 "to": [user.email],
                 "username": user.username,
-                "otp": otp
+                "otp": otp,
+                "alt_link": currently_hosted_domain + reverse("activate", kwargs={"username": user.username, "otp": otp}),
             }
             send_mail(mail_data)
             return MyResponse.success(data=serializer.data, message='User registered successfully. Check your email for OTP.', status_code=status.HTTP_201_CREATED)
         return MyResponse.failure(data=serializer.errors, message='User registration failed.', status_code=status.HTTP_400_BAD_REQUEST)
 
 class ActivateUserView(APIView):
-    def post(self, request, format=None):
-        serializer = ActivateUserSerializer(data=request.data)
+    def get(self, request, username, otp, format=None):
+        serializer = ActivateUserSerializer(data={
+            'username': username,
+            'otp': otp
+        })
         if serializer.is_valid():
             username = serializer.data['username']
             otp_input = serializer.data['otp']
@@ -92,6 +101,14 @@ class UserProfileView(APIView):
         conversions = PhotoConversion.objects.filter(user=user)
         serializer_conversions = PhotoConversionDetailSerializer(conversions, many=True)
         return MyResponse.success(data={'user': serializer_user.data, 'conversions': serializer_conversions.data}, message='User profile retrieved successfully.', status_code=status.HTTP_200_OK)
+    
+class CheckEmailTemplateView(APIView):
+    def get(self, request, format=None):
+        return render(request, 'email/otp_email.html', {
+            "username": "darpan.kattel",
+            "otp": "123456",
+            "alt_link": currently_hosted_domain + reverse("activate", kwargs={"username": "darpan.kattel", "otp": "123456"}),
+        })
 
 # class PasswordChangeView(APIView):
 #     def post(self, request, format=None):

@@ -1,5 +1,4 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -52,6 +51,12 @@ class ConversionDetailView(APIView):
     def delete(self, request, reference_id, format=None):
         try:
             photo_conversion = PhotoConversion.objects.get(reference_id=reference_id, user=request.user)
+            try:
+                photo_conversion.input_image.delete()
+                print("Input Image deleted successfully")
+                photo_conversion.output_image.delete()
+            except Exception as e:
+                print(f"Error during image deletion: {e}")
             photo_conversion.delete()
             return MyResponse.success(data={"reference_id": reference_id}, message='Conversion deleted successfully.', status_code=status.HTTP_200_OK)
         except Exception as e:
@@ -69,7 +74,6 @@ class ConversionListView(APIView):
             return MyResponse.success(data=serializer.data, status_code=status.HTTP_200_OK)
 
         except Exception as e:
-            # Log the error if necessary
             print(f"Error during conversion history retrieval: {e}")
             return MyResponse.failure(message='Failed to fetch conversion history.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

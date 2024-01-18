@@ -14,13 +14,10 @@ def send_mail(data):
     template = data.get('template')
     to = data.get('to')
     text = ""
-    username = data.get('username')
-    print(subject, template, to, username)
 
     reply_to = settings.EMAIL_REPLY_TO_USER
     from_email = settings.EMAIL_HOST_USER
-    html_content = render_to_string(
-        template, data)
+    html_content = render_to_string(template, data)
 
     mail = EmailMultiAlternatives(subject, text, from_email, to,
                                   reply_to=[reply_to, ])
@@ -39,7 +36,7 @@ def generate_otp(length=6):
 
 def save_otp(user):
     otp_instance, created = OTP.objects.get_or_create(user=user)
-    if created or otp_instance.expired:
+    if otp_instance.expired:
         otp_instance.otp = generate_otp()
         otp_instance.created = timezone.now()
     otp_instance.save()
