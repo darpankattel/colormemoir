@@ -1,4 +1,4 @@
 env/
-static/
+# static/
 # docs/
-media/
+# media/
