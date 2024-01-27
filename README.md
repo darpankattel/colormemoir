@@ -76,11 +76,11 @@ python manage.py runserver
 Visit http://localhost:8000 to access the Colormemoir web interface.
 
 ## Usage
-#### 1. Open the Colormemoir web interface in your browser.
-#### 2. Sign Up/ Log In to your account.
-#### 3. Upload a black and white image.
-#### 4. Initiate the colorization process.
-#### 5. Check the status and download the colored image once the process is complete.
+1. Open the Colormemoir web interface in your browser.
+2. Sign Up/ Log In to your account.
+3. Upload a black and white image.
+4. Initiate the colorization process.
+5. Check the status and download the colored image once the process is complete.
 
 ## Contributing
 If you'd like to contribute to ColorMemoir, please follow the Contributing Guidelines.
