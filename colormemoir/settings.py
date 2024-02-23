@@ -24,6 +24,7 @@ SECRET_KEY = 'django-insecure-3h09eos$tb!-*313j*zs9$t60u=+zxn5e1l5eo)kjd!x-1@cfh
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+DEPLOYED = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -130,20 +131,20 @@ EMAIL_REPLY_TO_USER = "info@colormemoir.com"
 EMAIL_HOST_PASSWORD = "hkcglkvrqhliamkc"
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-if DEBUG:
+MEDIA_URL = 'media/'
+if not DEPLOYED:
     STATICFILES_DIRS = [
         BASE_DIR / "static",
     ]
+    MEDIA_ROOT = BASE_DIR / 'media'
 else:
     STATIC_ROOT = '/static/'
+    MEDIA_ROOT = '/media/'
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
