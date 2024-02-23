@@ -77,3 +77,11 @@ class ConversionListView(APIView):
             print(f"Error during conversion history retrieval: {e}")
             return MyResponse.failure(message='Failed to fetch conversion history.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class ConversionCheckView(APIView):
+    def get(self, request, format=None):
+        try:
+            photo_conversion = PhotoConversion.objects.get(id= request.GET.get('id'))
+            initiate_conversion(photo_conversion)
+        except PhotoConversion.DoesNotExist:
+            return MyResponse.failure(message='Conversion not found.', status_code=status.HTTP_404_NOT_FOUND)  
+        return MyResponse.success(message='done')
