@@ -1,5 +1,6 @@
 env/
 lenv/
+photo_conversion/models/
 # static/
 # docs/
 # media/
