@@ -6,7 +6,6 @@ import os
 from django.conf import settings
 from pathlib import Path
 
-
 if os.name == 'nt':
     DEF_PATH = Path(__file__).resolve().parent
 else:
@@ -27,13 +26,7 @@ def model():
     return loaded_model
 
 
-def initiate_conversion(photo_conversion):
-    input_image_url = os.path.join(
-        settings.MEDIA_ROOT, photo_conversion.input_image.name)  # .replace("/", "\\")
-    output_image_path = os.path.join(
-        settings.MEDIA_ROOT, 'output_images', photo_conversion.reference_id + '.jpg')  # .replace("/", "\\")
-
-    # Read image
+def convert(input_image_url, output_image_path):
     img = cv2.imread(input_image_url)
 
     # Convert image to RGB
@@ -62,7 +55,30 @@ def initiate_conversion(photo_conversion):
     res_image_uint8 = (res_image * 255).astype(np.uint8)
 
     # Save resulting image
-    if cv2.imwrite(output_image_path, cv2.cvtColor(res_image_uint8, cv2.COLOR_RGB2BGR)):
+    return cv2.imwrite(output_image_path, cv2.cvtColor(res_image_uint8, cv2.COLOR_RGB2BGR))
+
+
+def initiate_conversion(photo_conversion):
+    input_image_url = os.path.join(
+        settings.MEDIA_ROOT, photo_conversion.input_image.name)  # .replace("/", "\\")
+    output_image_path = os.path.join(
+        settings.MEDIA_ROOT, 'output_images', photo_conversion.reference_id + '.jpg')  # .replace("/", "\\")
+
+    if convert(input_image_url, output_image_path):
         photo_conversion.status = 'completed'
         photo_conversion.output_image = output_image_path
         photo_conversion.save()
+
+
+def convert_all(from_dir, to_dir):
+    files = os.listdir(from_dir)
+    # print(files)
+    for f in files:
+        from_path = os.path.join(from_dir, f)
+        to_path = os.path.join(to_dir, f)
+        # if os.path.isfile(f):
+        convert(from_path, to_path)
+        # print(f"converting {from_path} to {to_path}")
+        # else:
+        #     print(
+        #         f"Skipping {from_path} | {to_path} because it is not a file.")
