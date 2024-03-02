@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -7,12 +8,18 @@ from .serializers import ConversionInitiationSerializer, PhotoConversionDetailSe
 from .utils import initiate_conversion
 from core.response import MyResponse
 
+
 class ConversionInitiationView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
     def post(self, request, format=None):
-        data = {**request.data, "user": request.user}
+        data = {**request.data}
+        data = {
+            "name": data["name"][0],
+            "input_image": data["input_image"][0],
+            "user": request.user,
+        }
         print(data)
         serializer = ConversionInitiationSerializer(data=data)
         if serializer.is_valid():
@@ -23,6 +30,7 @@ class ConversionInitiationView(APIView):
                     input_image=serializer.validated_data['input_image'],
                 )
                 initiate_conversion(photo_conversion)
+                serializer = PhotoConversionDetailSerializer(photo_conversion)
                 return MyResponse.success(data=serializer.data, message="Conversion initiated.", status_code=status.HTTP_200_OK)
 
             except Exception as e:
@@ -35,22 +43,25 @@ class ConversionInitiationView(APIView):
 class ConversionDetailView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
+
     def get(self, request, reference_id, format=None):
         try:
-            photo_conversion = PhotoConversion.objects.get(reference_id=reference_id, user=request.user)
+            photo_conversion = PhotoConversion.objects.get(
+                reference_id=reference_id, user=request.user)
             serializer = PhotoConversionDetailSerializer(photo_conversion)
             return MyResponse.success(data=serializer.data, status_code=status.HTTP_200_OK)
 
         except PhotoConversion.DoesNotExist:
-            return MyResponse.failure(data=serializer.data, message='Conversion not found.', status_code=status.HTTP_404_NOT_FOUND)
+            return MyResponse.failure(data=request.data, message='Conversion not found.', status_code=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             print(f"Error during conversion detail fetch: {e}")
             return MyResponse.failure(data=serializer.errors, message='Failed to fetch conversion details.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
     def delete(self, request, reference_id, format=None):
         try:
-            photo_conversion = PhotoConversion.objects.get(reference_id=reference_id, user=request.user)
+            photo_conversion = PhotoConversion.objects.get(
+                reference_id=reference_id, user=request.user)
             try:
                 photo_conversion.input_image.delete()
                 print("Input Image deleted successfully")
@@ -63,25 +74,26 @@ class ConversionDetailView(APIView):
             print(f"Error during conversion deletion: {e}")
             return MyResponse.failure(message='Failed to delete conversion.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class ConversionListView(APIView):
+
+class ConversionListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
+    serializer_class = PhotoConversionDetailSerializer
 
-    def get(self, request, format=None):
+    def get_queryset(self, *args, **kwargs):
+        user = self.request.user
         try:
-            conversion_history = PhotoConversion.objects.filter(user=request.user)
-            serializer = PhotoConversionDetailSerializer(conversion_history, many=True)
-            return MyResponse.success(data=serializer.data, status_code=status.HTTP_200_OK)
-
+            return PhotoConversion.objects.filter(user=user)
         except Exception as e:
-            print(f"Error during conversion history retrieval: {e}")
-            return MyResponse.failure(message='Failed to fetch conversion history.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return PhotoConversion.objects.none()
+
 
 class ConversionCheckView(APIView):
     def get(self, request, format=None):
         try:
-            photo_conversion = PhotoConversion.objects.get(id= request.GET.get('id'))
+            photo_conversion = PhotoConversion.objects.get(
+                id=request.GET.get('id'))
             initiate_conversion(photo_conversion)
         except PhotoConversion.DoesNotExist:
-            return MyResponse.failure(message='Conversion not found.', status_code=status.HTTP_404_NOT_FOUND)  
+            return MyResponse.failure(message='Conversion not found.', status_code=status.HTTP_404_NOT_FOUND)
         return MyResponse.success(message='done')

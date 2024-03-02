@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,9 +47,11 @@ INSTALLED_APPS = [
     # rest
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -134,17 +137,31 @@ EMAIL_HOST_PASSWORD = "hkcglkvrqhliamkc"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+
 if not DEPLOYED:
     STATICFILES_DIRS = [
         BASE_DIR / "static",
     ]
     MEDIA_ROOT = BASE_DIR / 'media'
 else:
-    STATIC_ROOT = '/static/'
-    MEDIA_ROOT = '/media/'
+    STATIC_ROOT = '/var/www/station/static/'
+    MEDIA_ROOT = '/var/www/station/media/'
 
+    # CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_URLS_REGEX = r'^/api/v1/.*$'
+# allow header
+# CORS_ALLOW_HEADERS = [
+#     'ngrok-skip-browser-warning',
+# ]
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000',
+                        'http://127.0.0.1:3000', 'https://fmnepalaakash.vercel.app']
+# allow all csrf origins
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

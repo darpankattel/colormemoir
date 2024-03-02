@@ -3,16 +3,20 @@ from django.utils import timezone
 from rest_framework import serializers
 from .models import OTP
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
 
+
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # exclude password, groups, permission, is_superuser
-        exclude = ['password', 'is_superuser', 'is_staff', 'groups', 'user_permissions']
+        exclude = ['password', 'is_superuser',
+                   'is_staff', 'groups', 'user_permissions']
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,9 +28,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+
 class ActivateUserSerializer(serializers.Serializer):
     username = serializers.CharField()
     otp = serializers.CharField(max_length=6)
+
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -37,7 +43,8 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password')
 
         if not username or not password:
-            raise serializers.ValidationError("Both username and password are required.")
+            raise serializers.ValidationError(
+                "Both username and password are required.")
 
         return data
 

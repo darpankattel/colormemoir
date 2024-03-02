@@ -66,7 +66,8 @@ def initiate_conversion(photo_conversion):
 
     if convert(input_image_url, output_image_path):
         photo_conversion.status = 'completed'
-        photo_conversion.output_image = output_image_path
+        photo_conversion.output_image = "/output_images/" + \
+            photo_conversion.reference_id + ".jpg"
         photo_conversion.save()
 
 

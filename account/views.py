@@ -17,6 +17,7 @@ from django.urls import reverse
 from constants import currently_hosted_domain
 from django.shortcuts import render
 
+
 class RegisterView(APIView):
     def post(self, request, format=None):
         serializer = RegisterSerializer(data=request.data)
@@ -38,6 +39,7 @@ class RegisterView(APIView):
             return MyResponse.success(data=serializer.data, message='User registered successfully. Check your email for OTP.', status_code=status.HTTP_201_CREATED)
         return MyResponse.failure(data=serializer.errors, message='User registration failed.', status_code=status.HTTP_400_BAD_REQUEST)
 
+
 class ActivateUserView(APIView):
     def get(self, request, username, otp, format=None):
         serializer = ActivateUserSerializer(data={
@@ -47,7 +49,7 @@ class ActivateUserView(APIView):
         if serializer.is_valid():
             username = serializer.data['username']
             otp_input = serializer.data['otp']
-            
+
             try:
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
@@ -61,7 +63,6 @@ class ActivateUserView(APIView):
                 return MyResponse.failure(message='Invalid OTP.', status_code=status.HTTP_400_BAD_REQUEST)
 
         return MyResponse.failure(data=serializer.errors, status_code=status.HTTP_400_BAD_REQUEST)
-
 
 
 class LoginView(APIView):
@@ -81,9 +82,11 @@ class LoginView(APIView):
 
         return MyResponse.failure(data=serializer.errors, status_code=status.HTTP_400_BAD_REQUEST)
 
+
 class LogoutView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
         # logout and also delete the token
         token = request.auth
@@ -95,13 +98,16 @@ class LogoutView(APIView):
 class UserProfileView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
         user = request.user
         serializer_user = UserDetailSerializer(user)
         conversions = PhotoConversion.objects.filter(user=user)
-        serializer_conversions = PhotoConversionDetailSerializer(conversions, many=True)
+        serializer_conversions = PhotoConversionDetailSerializer(
+            conversions, many=True)
         return MyResponse.success(data={'user': serializer_user.data, 'conversions': serializer_conversions.data}, message='User profile retrieved successfully.', status_code=status.HTTP_200_OK)
-    
+
+
 class CheckEmailTemplateView(APIView):
     def get(self, request, format=None):
         return render(request, 'email/otp_email.html', {
