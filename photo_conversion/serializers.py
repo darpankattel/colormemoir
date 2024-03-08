@@ -9,7 +9,7 @@ class PhotoConversionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotoConversion
         fields = ['name', 'input_image', 'reference_id',
-                  'output_image', 'created', 'status']
+                  'output_image', 'created', 'status', 'loss', 'accuracy']
 
 
 class ConversionInitiationSerializer(serializers.Serializer):

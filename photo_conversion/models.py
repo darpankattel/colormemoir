@@ -27,6 +27,8 @@ class PhotoConversion(models.Model):
     status = models.CharField(
         max_length=10, choices=CONVERSION_STATUS_CHOICES, default='pending')
     created = models.DateTimeField(auto_now_add=True)
+    loss = models.FloatField(blank=True, null=True)
+    accuracy = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return self.reference_id

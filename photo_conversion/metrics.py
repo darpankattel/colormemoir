@@ -125,6 +125,9 @@ def convert_to_bandw(from_dir, to_dir):
     input_folder = from_dir
     output_folder = to_dir
 
+    print("Converting images to black and white...")
+    print(input_folder, output_folder)
+
     # Create the output folder if it doesn't exist
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -156,8 +159,8 @@ if __name__ == '__main__':
         log_to_json('../media/test_test_set/colored/',
                     '../media/test_test_set/groundtruth/')
     elif "--bandw" in args:
-        convert_to_bandw('../media/test_test_set/groundtruth/',
-                         '../media/test_test_set/bandw/')
+        convert_to_bandw('../media/new_test_set/',
+                         '../media/new_test_set_bandw/')
     elif "--convert" in args:
         convert_all('../media/test_test_set/bandw/',
                     '../media/test_test_set/colored/')
