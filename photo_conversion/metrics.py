@@ -162,8 +162,15 @@ if __name__ == '__main__':
         convert_to_bandw('../media/new_test_set/',
                          '../media/new_test_set_bandw/')
     elif "--convert" in args:
+        import time
+        start = time.time()
         convert_all('../media/test_test_set/bandw/',
                     '../media/test_test_set/colored/')
+        end = time.time()
+        print(f"Elapsed time : {end - start}")
+        print(
+            f"Per image : {(end - start) / len(os.listdir('../media/test_test_set/bandw/'))}")
+
     elif "--calc" in args:
         calculate_average_metrics()
     else:

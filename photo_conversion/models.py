@@ -29,6 +29,7 @@ class PhotoConversion(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     loss = models.FloatField(blank=True, null=True)
     accuracy = models.FloatField(blank=True, null=True)
+    resolution = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.reference_id

@@ -7,6 +7,7 @@ from .models import PhotoConversion
 from .serializers import ConversionInitiationSerializer, PhotoConversionDetailSerializer
 from .utils import initiate_conversion
 from core.response import MyResponse
+from django.core.files.images import get_image_dimensions
 
 
 class ConversionInitiationView(APIView):
@@ -29,6 +30,13 @@ class ConversionInitiationView(APIView):
                     name=serializer.validated_data['name'],
                     input_image=serializer.validated_data['input_image'],
                 )
+                # get image resoulution from serializer.validated_data['input_image']
+                w, h = get_image_dimensions(
+                    serializer.validated_data['input_image'])
+                print(w, h)
+
+                photo_conversion.resolution = f"{w}x{h}"
+                photo_conversion.save()
                 initiate_conversion(photo_conversion)
                 serializer = PhotoConversionDetailSerializer(photo_conversion)
                 return MyResponse.success(data=serializer.data, message="Conversion initiated.", status_code=status.HTTP_200_OK)
