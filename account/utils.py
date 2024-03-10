@@ -31,8 +31,10 @@ def send_mail(data):
 
     return True
 
+
 def generate_otp(length=6):
     return ''.join(str(random.randint(0, 9)) for _ in range(length))
+
 
 def save_otp(user):
     otp_instance, created = OTP.objects.get_or_create(user=user)
@@ -41,6 +43,7 @@ def save_otp(user):
         otp_instance.created = timezone.now()
     otp_instance.save()
     return otp_instance.otp
+
 
 def verify_otp(user, otp_input):
     try:

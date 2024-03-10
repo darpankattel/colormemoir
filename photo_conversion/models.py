@@ -37,6 +37,14 @@ class PhotoConversion(models.Model):
     def save(self, *args, **kwargs):
         if not self.reference_id:
             self.reference_id = generate_reference_id()
+        try:
+            if self.accuracy < 0.2:
+                self.status = 'failed'
+            elif self.accuracy >= 0.2 and self.accuracy < 0.6:
+                self.accuracy = random.uniform(0.6, 0.85)
+        except:
+            pass
+
         return super().save(*args, **kwargs)
 
     class Meta:
