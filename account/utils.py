@@ -26,6 +26,7 @@ def send_mail(data):
         mail.send(fail_silently=False)
         return True
     except Exception as e:
+        pass
         raise
         # return False
 
