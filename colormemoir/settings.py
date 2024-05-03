@@ -129,9 +129,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_SSL = True
 EMAIL_PORT = 465
-EMAIL_HOST_USER = "kattelktl@gmail.com"
+host_email = ""
+host_psw = ""
+EMAIL_HOST_USER = host_email
 EMAIL_REPLY_TO_USER = "info@colormemoir.com"
-EMAIL_HOST_PASSWORD = "hkcglkvrqhliamkc"
+EMAIL_HOST_PASSWORD = host_psw
 
 
 # Static files (CSS, JavaScript, Images)
